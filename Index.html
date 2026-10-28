@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0B1829">
+    <meta name="description" content="ONESIDE Legal — gestión de casos jurídicos y cotizaciones.">
+    <title>ONESIDE Legal | Gestión de casos</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                    colors: {
+                        'royal-blue': '#0B1829',
+                        'royal-blue-dark': '#142A43',
+                        'brand-gold': '#C6A66B',
+                        'brand-cream': '#F6F5F1'
+                    }
+                }
+            }
+        };
+    </script>
+
+    <style>
+        :root {
+            --navy: #0B1829;
+            --navy-light: #142A43;
+            --gold: #C6A66B;
+            --cream: #F6F5F1;
+            --text: #202B39;
+            --muted: #77808D;
+            --border: #E7E5DF;
+            --shadow: 0 8px 30px rgba(11, 24, 41, .055);
+        }
+        * { box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--cream);
+            color: var(--text);
+            letter-spacing: -.015em;
+            -webkit-font-smoothing: antialiased;
+        }
+        ::selection { background: #C6A66B44; color: var(--navy); }
+
+        .topbar {
+            background: var(--navy);
+            border-bottom: 1px solid rgba(198,166,107,.35);
+            box-shadow: 0 3px 18px rgba(11,24,41,.12);
+        }
+        .brand-mark {
+            width: 39px; height: 39px; display: grid; place-items: center;
+            border: 1px solid rgba(198,166,107,.55); border-radius: 11px;
+            color: var(--gold); background: rgba(255,255,255,.035);
+        }
+        .eyebrow { letter-spacing: .18em; }
+        .btn-primary {
+            background: var(--navy); color: #fff; border-radius: 9px;
+            transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+        }
+        .btn-primary:hover { background: var(--navy-light); transform: translateY(-1px); }
+        .btn-gold {
+            background: var(--gold); color: var(--navy); border-radius: 9px;
+            transition: background .2s ease, transform .2s ease;
+        }
+        .btn-gold:hover { background: #D3B77F; transform: translateY(-1px); }
+
+        .section-title {
+            color: var(--navy); letter-spacing: -.055em;
+            font-size: clamp(1.7rem, 3vw, 2.2rem); font-weight: 700;
+        }
+        .title-rule { width: 42px; height: 3px; background: var(--gold); border-radius: 3px; }
+
+        .case-card {
+            background: #fff; border: 1px solid var(--border); border-radius: 16px;
+            box-shadow: 0 3px 14px rgba(11,24,41,.025);
+            transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+            overflow: hidden; display: flex; flex-direction: column;
+        }
+        .case-card:hover {
+            transform: translateY(-4px); box-shadow: 0 14px 34px rgba(11,24,41,.09);
+            border-color: #D7C6A5;
+        }
+        .case-document {
+            background: #F8F7F4; border: 1px solid #EEECE6; border-radius: 11px;
+        }
+        .case-card-footer { background: #FAF9F6; border-top: 1px solid var(--border); }
+        .status-regular {
+            background: #E9EDF3; color: var(--navy); border: 1px solid #D9E0E9;
+        }
+        .status-probono {
+            background: #E9F3EC; color: #286644; border: 1px solid #D5E7DA;
+        }
+
+        .modal-backdrop {
+            background: rgba(8,18,31,.65); backdrop-filter: blur(7px);
+            -webkit-backdrop-filter: blur(7px);
+        }
+        .modal-panel {
+            border-radius: 20px; box-shadow: 0 28px 90px rgba(0,0,0,.22);
+            border: 1px solid rgba(255,255,255,.7);
+        }
+        .modal-header {
+            background: var(--navy); border-bottom: 2px solid var(--gold);
+        }
+        .form-label { display: block; color: #344052; font-size: .83rem; font-weight: 600; margin-bottom: 7px; }
+        .form-control {
+            width: 100%; min-height: 44px; padding: 11px 13px;
+            border: 1px solid #DCDDDC; border-radius: 9px; background: #fff;
+            color: var(--text); transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .form-control:focus {
+            border-color: var(--gold); box-shadow: 0 0 0 3px rgba(198,166,107,.16); outline: none;
+        }
+        .form-control::placeholder { color: #A0A5AD; font-weight: 400; }
+        .soft-panel { background: #F8F7F4; border: 1px solid var(--border); border-radius: 12px; }
+        .quote-table { border-collapse: collapse; }
+        .quote-table thead { background: #F5F4F0; }
+        .quote-table th {
+            color: #707784; font-size: .69rem; letter-spacing: .08em;
+            text-transform: uppercase; padding: 13px 16px; text-align: left;
+        }
+        .quote-table td { padding: 14px 16px; border-top: 1px solid #EEECE6; }
+        .custom-scrollbar { scrollbar-width: thin; scrollbar-color: var(--gold) #F1F0EC; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #F1F0EC; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 10px; }
+        footer { background: var(--navy); border-top: 2px solid var(--gold); color: #D1D7E0; }
+        button:focus-visible { outline: 3px solid rgba(198,166,107,.6); outline-offset: 3px; }
+        .empty-state { background: #fff; border: 1px solid var(--border); border-radius: 18px; box-shadow: var(--shadow); }
+        @media (max-width: 640px) {
+            .modal-panel { max-height: 94vh; border-radius: 15px; }
+            .modal-body, .modal-header, .modal-footer { padding-left: 18px !important; padding-right: 18px !important; }
+            .modal-footer-actions { display: flex; flex-direction: column-reverse; width: 100%; }
+            .modal-footer-actions button { width: 100%; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+        }
+    </style>
+</head>
+
+<body class="min-h-screen flex flex-col antialiased">
+    <header class="topbar text-white sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-[76px]">
+                <a href="#" class="flex items-center gap-3" aria-label="ONESIDE Legal, inicio">
+                    <span class="brand-mark"><i class="fa-solid fa-scale-balanced text-lg"></i></span>
+                    <span>
+                        <span class="block font-bold text-lg tracking-[.14em]">ONESIDE</span>
+                        <span class="block text-[9px] uppercase tracking-[.27em] text-slate-300 -mt-0.5">Legal workspace</span>
+                    </span>
+                </a>
+                <button id="btnOpenModal" class="btn-gold font-semibold py-3 px-4 sm:px-5 flex items-center gap-2 text-sm">
+                    <i class="fa-solid fa-plus"></i>
+                    <span>Nuevo caso</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-14">
+        <section class="mb-9">
+            <p class="eyebrow text-[10px] sm:text-xs font-semibold uppercase text-gray-500 mb-3">ONESIDE · MARCHENA CONSULTORES</p>
+            <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                    <h1 class="section-title">Gestión de casos</h1>
+                    <div class="title-rule mt-4"></div>
+                    <p class="text-sm sm:text-base text-gray-500 mt-4 max-w-2xl leading-7">
+                        Administra tus asuntos jurídicos, documentos requeridos y cotizaciones desde un solo lugar.
+                    </p>
+                </div>
+                <div class="text-xs font-medium text-gray-500 flex items-center gap-2 pb-1">
+                    <i class="fa-regular fa-folder-open text-[#A78950]"></i>
+                    <span>Panel de asuntos jurídicos</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-sm font-semibold text-[#0B1829]">Casos registrados</h2>
+            <span class="text-xs text-gray-400">Actualización en tiempo real</span>
+        </div>
+
+        <div id="casesLoading" class="flex justify-center items-center py-16 text-[#0B1829]">
+            <i class="fa-solid fa-circle-notch fa-spin text-2xl"></i>
+            <span class="ml-3 text-sm text-gray-500">Cargando casos...</span>
+        </div>
+
+        <div id="casesEmpty" class="hidden flex-col items-center justify-center py-16 px-6 text-center empty-state">
+            <div class="w-16 h-16 rounded-2xl bg-[#F6F3EC] flex items-center justify-center mb-5">
+                <i class="fa-regular fa-folder-open text-2xl text-[#A78950]"></i>
+            </div>
+            <p class="text-lg font-semibold text-[#0B1829]">Aún no hay casos registrados</p>
+            <p class="text-sm mt-2 text-gray-500 max-w-sm">Crea tu primer caso para organizar la información jurídica, los documentos y la cotización correspondiente.</p>
+            <button type="button" id="btnEmptyCreate" class="btn-primary mt-6 px-5 py-3 text-sm font-semibold">
+                <i class="fa-solid fa-plus mr-2"></i>Crear primer caso
+            </button>
+        </div>
+
+        <div id="casesList" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5"></div>
+    </main>
+
+    <footer class="mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+            <div class="flex items-center gap-2">
+                <span class="text-[#C6A66B]"><i class="fa-solid fa-scale-balanced"></i></span>
+                <span class="font-semibold tracking-[.12em]">ONESIDE LEGAL</span>
+            </div>
+            <p>© 2026 ONESIDE Legal. Todos los derechos reservados.</p>
+            <p class="text-slate-400">Una solución de Marchena Consultores</p>
+        </div>
+    </footer>
+
+    <!-- Modal de creación de caso -->
+    <div id="createCaseModal" class="fixed inset-0 z-50 hidden opacity-0 transition-opacity duration-300 modal-backdrop p-3 sm:p-5 flex items-center justify-center" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <div id="modalContent" class="modal-panel bg-white w-full max-w-2xl max-h-[94vh] flex flex-col overflow-hidden transform scale-95 transition-transform duration-300">
+            <div class="modal-header text-white px-7 py-5 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <span class="w-10 h-10 rounded-xl border border-white/15 bg-white/5 flex items-center justify-center text-[#C6A66B]">
+                        <i class="fa-solid fa-file-circle-plus"></i>
+                    </span>
+                    <div>
+                        <h2 id="modalTitle" class="text-lg font-semibold">Crear nuevo caso</h2>
+                        <p class="text-xs text-slate-300 mt-1">Información general y propuesta económica</p>
+                    </div>
+                </div>
+                <button type="button" id="btnCloseModal" class="text-slate-300 hover:text-white p-2" aria-label="Cerrar ventana">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+            </div>
+
+            <div class="modal-body px-7 py-6 overflow-y-auto custom-scrollbar flex-grow">
+                <form id="caseForm" class="space-y-6">
+                    <section>
+                        <div class="flex items-center gap-2 mb-4">
+                            <span class="text-[#A78950] text-sm"><i class="fa-regular fa-rectangle-list"></i></span>
+                            <h3 class="font-semibold text-[#0B1829]">Información del asunto</h3>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="caseName" class="form-label">Nombre del caso <span class="text-red-500">*</span></label>
+                                <input type="text" id="caseName" required maxlength="180" class="form-control" placeholder="Ej. Revisión contractual — Cliente Pérez">
+                            </div>
+                            <div>
+                                <label for="caseDescription" class="form-label">Descripción del caso <span class="text-red-500">*</span></label>
+                                <textarea id="caseDescription" required maxlength="3000" rows="3" class="form-control resize-y" placeholder="Describe brevemente el asunto, su contexto y los objetivos principales..."></textarea>
+                            </div>
+                            <div>
+                                <label for="caseDocument" class="form-label">Documento requerido <span class="text-red-500">*</span></label>
+                                <input type="text" id="caseDocument" required maxlength="500" class="form-control" placeholder="Ej. Contrato, poder, certificado de existencia...">
+                            </div>
+                        </div>
+                    </section>
+
+                    <div class="border-t border-[#E7E5DF]"></div>
+
+                    <section>
+                        <div class="flex items-center gap-3 mb-4">
+                            <span class="w-10 h-10 rounded-xl bg-[#F6F3EC] text-[#A78950] flex items-center justify-center">
+                                <i class="fa-solid fa-calculator"></i>
+                            </span>
+                            <div>
+                                <h3 class="font-semibold text-[#0B1829]">Cotización inicial</h3>
+                                <p class="text-xs text-gray-500 mt-1">Agrega los conceptos y sus valores en pesos colombianos.</p>
+                            </div>
+                        </div>
+
+                        <div class="soft-panel p-3 sm:p-4 mb-4">
+                            <div class="grid grid-cols-1 sm:grid-cols-[1fr_150px_auto] gap-3 items-end">
+                                <div>
+                                    <label for="itemName" class="form-label">Concepto</label>
+                                    <input type="text" id="itemName" maxlength="180" class="form-control" placeholder="Ej. Honorarios">
+                                </div>
+                                <div>
+                                    <label for="itemValue" class="form-label">Valor (COP)</label>
+                                    <input type="number" id="itemValue" min="0" step="1" inputmode="numeric" class="form-control" placeholder="0">
+                                </div>
+                                <button type="button" id="btnAddItem" class="btn-primary px-4 py-3 text-sm font-semibold whitespace-nowrap">
+                                    <i class="fa-solid fa-plus mr-1"></i>Agregar
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="border border-[#E7E5DF] rounded-xl overflow-hidden mb-4">
+                            <div class="overflow-x-auto">
+                                <table class="quote-table min-w-full text-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Concepto</th>
+                                            <th class="text-right">Valor</th>
+                                            <th class="w-12"></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="quoteItemsList" class="bg-white">
+                                        <tr id="emptyItemsRow">
+                                            <td colspan="3" class="px-4 py-7 text-center text-gray-400 text-xs">
+                                                <i class="fa-regular fa-file-lines block text-lg mb-2"></i>
+                                                Todavía no has agregado conceptos.
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <label for="proBonoCheck" class="flex items-start gap-3 rounded-xl border border-[#E0E5EC] bg-[#F1F3F6] p-4 cursor-pointer">
+                            <input type="checkbox" id="proBonoCheck" class="mt-1 w-4 h-4 accent-[#0B1829] cursor-pointer">
+                            <span>
+                                <span class="block text-sm font-semibold text-[#0B1829]">Marcar como caso pro bono</span>
+                                <span class="block text-xs text-gray-500 mt-1">La cotización final será de $ 0 COP. Los conceptos agregados se conservarán como referencia.</span>
+                            </span>
+                        </label>
+                    </section>
+                </form>
+            </div>
+
+            <div class="modal-footer px-7 py-5 border-t border-[#E7E5DF] bg-[#FAF9F6] flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="w-full sm:w-auto">
+                    <p class="text-xs font-medium text-gray-500">Total estimado</p>
+                    <div id="totalDisplay" class="text-2xl font-bold text-[#0B1829] tracking-tight mt-1">$ 0</div>
+                    <div id="proBonoBadge" class="hidden text-[10px] uppercase tracking-wider font-bold bg-green-100 text-green-800 px-2.5 py-1 rounded-md mt-2 inline-block">
+                        Pro bono activo
+                    </div>
+                </div>
+                <div class="modal-footer-actions w-full sm:w-auto flex gap-2">
+                    <button type="button" id="btnCancelModal" class="px-5 py-3 rounded-lg border border-[#DCDDDC] bg-white text-gray-600 hover:bg-gray-50 text-sm font-semibold">Cancelar</button>
+                    <button type="button" id="btnSubmitCase" class="btn-primary px-5 py-3 text-sm font-semibold flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-check"></i>Guardar caso
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de notificaciones -->
+    <div id="alertModal" class="fixed inset-0 z-[60] hidden opacity-0 transition-opacity duration-200 modal-backdrop p-4 flex items-center justify-center" role="alertdialog" aria-modal="true" aria-labelledby="alertTitle" aria-describedby="alertMessage">
+        <div id="alertContent" class="bg-white rounded-[18px] shadow-xl w-full max-w-sm p-7 text-center transform scale-95 transition-transform duration-200">
+            <div id="alertIcon" class="text-4xl mb-4"></div>
+            <h3 id="alertTitle" class="text-lg font-bold text-[#0B1829] mb-2"></h3>
+            <p id="alertMessage" class="text-gray-600 mb-6 text-sm leading-6"></p>
+            <button id="btnAlertClose" class="btn-primary px-6 py-3 w-full font-semibold text-sm">Entendido</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'oneside-legal-app';
+        let firebaseConfig = {};
+        try {
+            if (typeof __firebase_config !== 'undefined') {
+                firebaseConfig = JSON.parse(__firebase_config);
+            }
+        } catch (error) {
+            console.warn("No se pudo leer la configuración de Firebase.", error);
+        }
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let userId = null;
+        let unsubscribeCases = null;
+        let currentQuoteItems = [];
+        let isProBono = false;
+
+        const $ = (id) => document.getElementById(id);
+        const casesListContainer = $('casesList');
+        const casesLoading = $('casesLoading');
+        const casesEmpty = $('casesEmpty');
+        const createCaseModal = $('createCaseModal');
+        const modalContent = $('modalContent');
+        const btnOpenModal = $('btnOpenModal');
+        const btnEmptyCreate = $('btnEmptyCreate');
+        const caseForm = $('caseForm');
+        const caseNameInput = $('caseName');
+        const caseDescInput = $('caseDescription');
+        const caseDocInput = $('caseDocument');
+        const itemNameInput = $('itemName');
+        const itemValueInput = $('itemValue');
+        const quoteItemsList = $('quoteItemsList');
+        const emptyItemsRow = $('emptyItemsRow');
+        const proBonoCheck = $('proBonoCheck');
+        const totalDisplay = $('totalDisplay');
+        const proBonoBadge = $('proBonoBadge');
+        const btnSubmitCase = $('btnSubmitCase');
+        const alertModal = $('alertModal');
+        const alertContent = $('alertContent');
+        const alertIcon = $('alertIcon');
+        const alertTitle = $('alertTitle');
+        const alertMessage = $('alertMessage');
+        const btnAlertClose = $('btnAlertClose');
+
+        const formatCurrency = (value) => new Intl.NumberFormat('es-CO', {
+            style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0
+        }).format(value);
+
+        const showAlert = (title, message, type = 'info') => {
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
+            const iconClasses = {
+                error: 'fa-solid fa-circle-exclamation text-red-500',
+                success: 'fa-solid fa-circle-check text-green-600',
+                info: 'fa-solid fa-circle-info text-[#A78950]'
+            };
+            alertIcon.innerHTML = `<i class="${iconClasses[type] || iconClasses.info}"></i>`;
+            btnAlertClose.className = type === 'error'
+                ? 'bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg transition w-full font-semibold text-sm'
+                : 'btn-primary px-6 py-3 w-full font-semibold text-sm';
+
+            alertModal.classList.remove('hidden');
+            requestAnimationFrame(() => {
+                alertModal.classList.remove('opacity-0');
+                alertContent.classList.remove('scale-95');
+            });
+        };
+
+        const closeAlert = () => {
+            alertModal.classList.add('opacity-0');
+            alertContent.classList.add('scale-95');
+            setTimeout(() => alertModal.classList.add('hidden'), 200);
+        };
+        btnAlertClose.addEventListener('click', closeAlert);
+
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                const user = auth.currentUser;
+                if (!user) throw new Error('No se obtuvo un usuario autenticado.');
+                userId = user.uid;
+                loadCases();
+            } catch (error) {
+                console.error('Auth error:', error);
+                casesLoading.classList.add('hidden');
+                showAlert('Error de conexión', 'No fue posible iniciar sesión o conectar con la base de datos. Verifica la configuración de Firebase.', 'error');
+            }
+        };
+
+        const loadCases = () => {
+            if (!userId) return;
+            const casesRef = collection(db, 'artifacts', appId, 'users', userId, 'cases');
+            if (unsubscribeCases) unsubscribeCases();
+
+            unsubscribeCases = onSnapshot(casesRef, (snapshot) => {
+                casesLoading.classList.add('hidden');
+                const cases = [];
+                snapshot.forEach((docSnap) => cases.push({ id: docSnap.id, ...docSnap.data() }));
+                cases.sort((a, b) => {
+                    const aTime = a.createdAt?.toMillis ? a.createdAt.toMillis() : 0;
+                    const bTime = b.createdAt?.toMillis ? b.createdAt.toMillis() : 0;
+                    return bTime - aTime;
+                });
+
+                if (!cases.length) {
+                    casesListContainer.classList.add('hidden');
+                    casesEmpty.classList.remove('hidden');
+                    casesEmpty.classList.add('flex');
+                    return;
+                }
+                casesEmpty.classList.add('hidden');
+                casesEmpty.classList.remove('flex');
+                casesListContainer.classList.remove('hidden');
+                renderCases(cases);
+            }, (error) => {
+                console.error('Error fetching cases:', error);
+                casesLoading.classList.add('hidden');
+                showAlert('Error', 'No se pudieron cargar los casos. Comprueba las reglas y la conexión de Firestore.', 'error');
+            });
+        };
+
+        const escapeHTML = (value = '') => String(value).replace(/[&<>"']/g, (char) => ({
+            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+        })[char]);
+
+        const renderCases = (cases) => {
+            casesListContainer.replaceChildren();
+            cases.forEach((caseData) => {
+                const card = document.createElement('article');
+                card.className = 'case-card';
+                const name = escapeHTML(caseData.name || 'Caso sin nombre');
+                const description = String(caseData.description || '');
+                const shortDescription = escapeHTML(description.length > 120 ? description.slice(0, 120) + '…' : description);
+                const documentName = escapeHTML(caseData.requiredDocument || 'No especificado');
+                const isProBonoCase = Boolean(caseData.isProBono);
+                const totalText = isProBonoCase ? ' $ 0 COP · Pro bono' : escapeHTML(formatCurrency(Number(caseData.total) || 0));
+                card.innerHTML = `
+                    <div class="p-6 flex-grow">
+                        <div class="flex justify-between items-start gap-3 mb-4">
+                            <div class="min-w-0">
+                                <p class="text-[10px] uppercase tracking-[.16em] text-gray-400 mb-2">Asunto jurídico</p>
+                                <h3 class="text-base font-bold text-[#0B1829] leading-6 break-words">${name}</h3>
+                            </div>
+                            <span class="${isProBonoCase ? 'status-probono' : 'status-regular'} text-[10px] font-semibold px-2.5 py-1 rounded-md whitespace-nowrap">
+                                ${isProBonoCase ? 'Pro bono' : 'Regular'}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-500 leading-6 mb-5 whitespace-pre-line break-words">${shortDescription}</p>
+                        <div class="case-document p-4">
+                            <div class="flex items-start gap-3">
+                                <span class="text-[#A78950] mt-0.5"><i class="fa-regular fa-file-lines"></i></span>
+                                <div class="min-w-0">
+                                    <span class="block text-[10px] font-semibold text-gray-500 uppercase tracking-[.13em] mb-1">Documento requerido</span>
+                                    <span class="text-sm font-medium text-[#344052] break-words">${documentName}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="case-card-footer px-6 py-4 flex justify-between items-center gap-3">
+                        <span class="text-[10px] font-semibold text-gray-500 uppercase tracking-[.12em]">Total estimado</span>
+                        <span class="text-sm font-bold ${isProBonoCase ? 'text-green-700' : 'text-[#0B1829]'} text-right">${totalText}</span>
+                    </div>`;
+                casesListContainer.appendChild(card);
+            });
+        };
+
+        const openModal = () => {
+            resetForm();
+            createCaseModal.classList.remove('hidden');
+            document.body.classList.add('overflow-hidden');
+            requestAnimationFrame(() => {
+                createCaseModal.classList.remove('opacity-0');
+                modalContent.classList.remove('scale-95');
+            });
+            setTimeout(() => caseNameInput.focus(), 100);
+        };
+
+        const closeModal = () => {
+            createCaseModal.classList.add('opacity-0');
+            modalContent.classList.add('scale-95');
+            document.body.classList.remove('overflow-hidden');
+            setTimeout(() => createCaseModal.classList.add('hidden'), 300);
+        };
+
+        const resetForm = () => {
+            caseForm.reset();
+            currentQuoteItems = [];
+            isProBono = false;
+            proBonoCheck.checked = false;
+            renderQuoteItems();
+            updateTotalDisplay();
+        };
+
+        const addQuoteItem = () => {
+            const name = itemNameInput.value.trim();
+            const valueString = itemValueInput.value.trim();
+            if (!name) {
+                showAlert('Campo incompleto', 'Ingresa el nombre del concepto que deseas agregar.', 'error');
+                itemNameInput.focus();
+                return;
+            }
+            if (valueString === '' || !Number.isFinite(Number(valueString)) || Number(valueString) < 0) {
+                showAlert('Valor inválido', 'Ingresa un valor numérico igual o superior a cero.', 'error');
+                itemValueInput.focus();
+                return;
+            }
+            currentQuoteItems.push({ id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + Math.random()), name, value: Number(valueString) });
+            itemNameInput.value = '';
+            itemValueInput.value = '';
+            renderQuoteItems();
+            updateTotalDisplay();
+            itemNameInput.focus();
+        };
+
+        const removeQuoteItem = (id) => {
+            currentQuoteItems = currentQuoteItems.filter(item => item.id !== id);
+            renderQuoteItems();
+            updateTotalDisplay();
+        };
+
+        const renderQuoteItems = () => {
+            quoteItemsList.querySelectorAll('tr:not(#emptyItemsRow)').forEach(row => row.remove());
+            if (!currentQuoteItems.length) {
+                emptyItemsRow.classList.remove('hidden');
+                return;
+            }
+            emptyItemsRow.classList.add('hidden');
+
+            currentQuoteItems.forEach((item) => {
+                const tr = document.createElement('tr');
+                if (isProBono) tr.classList.add('opacity-50');
+                const nameCell = document.createElement('td');
+                nameCell.className = 'text-gray-800 break-words';
+                nameCell.textContent = item.name;
+                if (isProBono) nameCell.classList.add('line-through');
+
+                const valueCell = document.createElement('td');
+                valueCell.className = 'text-right text-gray-800 font-medium whitespace-nowrap';
+                valueCell.textContent = formatCurrency(item.value);
+                if (isProBono) valueCell.classList.add('line-through');
+
+                const actionCell = document.createElement('td');
+                actionCell.className = 'text-center';
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.className = 'text-gray-400 hover:text-red-600 p-2 transition';
+                removeButton.setAttribute('aria-label', `Eliminar ${item.name}`);
+                removeButton.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
+                removeButton.addEventListener('click', () => removeQuoteItem(item.id));
+                actionCell.appendChild(removeButton);
+
+                tr.append(nameCell, valueCell, actionCell);
+                quoteItemsList.appendChild(tr);
+            });
+        };
+
+        const updateTotalDisplay = () => {
+            const total = isProBono ? 0 : currentQuoteItems.reduce((sum, item) => sum + item.value, 0);
+            totalDisplay.textContent = formatCurrency(total);
+            totalDisplay.classList.toggle('text-green-700', isProBono);
+            totalDisplay.classList.toggle('text-[#0B1829]', !isProBono);
+            proBonoBadge.classList.toggle('hidden', !isProBono);
+            renderQuoteItems();
+        };
+
+        const submitCase = async () => {
+            if (!userId) {
+                showAlert('Sesión no disponible', 'No se ha podido autenticar al usuario. No es posible guardar el caso.', 'error');
+                return;
+            }
+            if (!caseForm.reportValidity()) return;
+
+            const name = caseNameInput.value.trim();
+            const description = caseDescInput.value.trim();
+            const requiredDocument = caseDocInput.value.trim();
+            if (!name || !description || !requiredDocument) {
+                showAlert('Campos requeridos', 'Completa el nombre, la descripción y el documento requerido.', 'error');
+                return;
+            }
+
+            const finalTotal = isProBono ? 0 : currentQuoteItems.reduce((sum, item) => sum + item.value, 0);
+            const caseData = {
+                name,
+                description,
+                requiredDocument,
+                items: currentQuoteItems.map(({ name: itemName, value }) => ({ name: itemName, value })),
+                isProBono,
+                total: finalTotal,
+                createdAt: serverTimestamp()
+            };
+
+            const originalHTML = btnSubmitCase.innerHTML;
+            btnSubmitCase.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Guardando...';
+            btnSubmitCase.disabled = true;
+            try {
+                const casesRef = collection(db, 'artifacts', appId, 'users', userId, 'cases');
+                await addDoc(casesRef, caseData);
+                closeModal();
+                showAlert('Caso creado', 'El caso se guardó correctamente.', 'success');
+            } catch (error) {
+                console.error('Error adding case:', error);
+                showAlert('No se pudo guardar', 'Ocurrió un problema al guardar el caso. Verifica tu conexión y vuelve a intentarlo.', 'error');
+            } finally {
+                btnSubmitCase.innerHTML = originalHTML;
+                btnSubmitCase.disabled = false;
+            }
+        };
+
+        btnOpenModal.addEventListener('click', openModal);
+        btnEmptyCreate.addEventListener('click', openModal);
+        $('btnCloseModal').addEventListener('click', closeModal);
+        $('btnCancelModal').addEventListener('click', closeModal);
+        $('btnAddItem').addEventListener('click', addQuoteItem);
+        btnSubmitCase.addEventListener('click', submitCase);
+        proBonoCheck.addEventListener('change', (event) => {
+            isProBono = event.target.checked;
+            updateTotalDisplay();
+        });
+
+        itemValueInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addQuoteItem();
+            }
+        });
+        itemNameInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                itemValueInput.focus();
+            }
+        });
+        createCaseModal.addEventListener('click', (event) => {
+            if (event.target === createCaseModal) closeModal();
+        });
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                if (!alertModal.classList.contains('hidden')) closeAlert();
+                else if (!createCaseModal.classList.contains('hidden')) closeModal();
+            }
+        });
+
+        initAuth();
+    </script>
+</body>
+</html>
